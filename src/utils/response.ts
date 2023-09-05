@@ -3,8 +3,7 @@ export enum StatusCode
 {
     OK = 202,
     ServerError = 500,
-    ClientError = 400,
-
+    BadRequest = 400,
 }
 
 interface Request 

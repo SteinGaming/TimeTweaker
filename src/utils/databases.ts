@@ -10,6 +10,7 @@ let mongoDB = undefined;
 
 async function initMongoDB() {
     const credentials = process.env.MONGODB_USER == undefined ? "" : process.env.MONGODB_USER + ":" + process.env.MONGODB_PASSWORD + "@"
+
     const url = 'mongodb://' + credentials + process.env.MONGODB_HOST;
     const dbName = process.env.MONGODB_DATABASE;
 
