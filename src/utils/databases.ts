@@ -3,7 +3,6 @@ import { MongoClient} from "mongodb";
 
 dotenv.config()
 
-
 export default async function getMongoDb()
 {
     const url = 'mongodb://' + process.env.MONGODB_HOST;
