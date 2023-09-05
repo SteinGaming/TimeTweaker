@@ -1,12 +1,11 @@
 import dotenv from "dotenv"
-import {MongoClient} from "mongodb";
+import {Db, MongoClient} from "mongodb";
 import {createClient, RedisClientType, RedisFunctions, RedisModules, RedisScripts} from "redis";
-import {unwatchFile} from "fs";
 
 dotenv.config()
 
 
-let mongoDB = undefined;
+let mongoDB: Db = undefined;
 
 async function initMongoDB() {
     const credentials = process.env.MONGODB_USER == undefined ? "" : process.env.MONGODB_USER + ":" + process.env.MONGODB_PASSWORD + "@"
