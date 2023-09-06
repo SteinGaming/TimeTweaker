@@ -1,6 +1,6 @@
 ## Example ".env" file
 
-```
+```.env
 # Webserver
 PORT=3000
 
@@ -14,3 +14,10 @@ MONGODB_DATABASE="timeTweaker"
 PASSWORD_PEPPER="n8Avq^xt9118KZ6"
 
 ```
+
+## TODO
+
+- [ ] Advanced logging system (log to file only if production mode)
+- [ ] Registration only with link
+- [ ] 2FA
+- [x] Registration

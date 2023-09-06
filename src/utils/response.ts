@@ -1,9 +1,11 @@
 import { Response } from "express";
 export enum StatusCode 
 {
-    OK = 202,
+    OK = 200,
+    Accepted = 202,
     ServerError = 500,
     BadRequest = 400,
+    Unauthorized = 401
 }
 
 interface Request 

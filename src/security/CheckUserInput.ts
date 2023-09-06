@@ -27,9 +27,9 @@ export function isFullname(fullname: string): string
     {
         return "Fullname too long!"
     }
-    if (fullname.length > FULLNAME_MIN_LENGTH)
+    if (fullname.length < FULLNAME_MIN_LENGTH)
     {
-        return "Password too short!"
+        return "Fullname is too short!"
     }
     const fullNameRegex = /^[A-Za-zäüöÄÜÖß]+(?:\s[A-Za-zäüöÄÜÖß]+)*$/;
     if (fullNameRegex.test(fullname))
@@ -53,7 +53,7 @@ export function isEmailAddress(email: string): string
 
 export function isPassword(password: string): string
 {
-    const regex = /^[A-Za-zÄäÖöÜüß0-9!@#$%^&*()_+=[\]{}|;:'",.<>/?\\\-]{8,255}$/;
+    const regex = /^[A-Za-zÄäÖöÜüß0-9!@#$%^&*()_+\[\]{}|;:'",.<>/?\\\-]{8,255}$/;
     console.log(password)
     if (regex.test(password))
     {
