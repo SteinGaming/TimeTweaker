@@ -4,16 +4,24 @@ import cookieParser from "cookie-parser";
 import Registration from "./routers/registration.js";
 import { getMongoDB } from "./utils/databases.js";
 import Authentication from "./routers/authentication.js";
+import ConfigureSession from "./startup/ConfigureSession.js";
+
 
 dotenv.config()
 
 const PORT = process.env.PORT || 80
 
+
+
 const app = express()
+
+// Security
+app.disable("x-powered-by");
+
 
 app.use(express.json())
 app.use(cookieParser())
-
+ConfigureSession(app)
 async function main()
 {
     const db = await getMongoDB()

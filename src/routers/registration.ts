@@ -5,7 +5,9 @@ import dotenv from "dotenv"
 import response, { StatusCode } from "../utils/response.js";
 import { isEmailAddress, isFullname, isPassword, isUsername } from "../security/CheckUserInput.js";
 import { DbUser } from "../utils/types/DbUser.js";
+import Logger from "../utils/logger.js";
 
+const logger = new Logger("Registration")
 dotenv.config()
 const PEPPER = process.env.PASSWORD_PEPPER
 
@@ -76,7 +78,10 @@ export default function Registration(app: Express, db: Db) // , db: Db
                 return response(res, {statusCode: StatusCode.BadRequest, message: "User already exists!"})
             }
             bcrypt.hash(PEPPER + body.password, 10, (err, hash) => {
-                if (err) throw err
+                if (err) 
+                {
+                    return logger.error(err)
+                }
                 users.insertOne({
                     username: body.username,
                     emailAddress: body.emailAddress,
@@ -89,7 +94,7 @@ export default function Registration(app: Express, db: Db) // , db: Db
                     lastSeen: null
                 })
 
-                console.log(`[Registration] Registrated User: ${body.username} (${body.fullName}) successfully!`)
+                logger.info(`Registrated User: ${body.username} (${body.fullname}) successfully!`)
 
                 response(res, {statusCode: StatusCode.OK})
     

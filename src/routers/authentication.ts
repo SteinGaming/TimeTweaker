@@ -51,6 +51,12 @@ export default function Authentication(app: Express, db: Db)
         }
 
         const body = req.body
+
+        // Checks if the user is already logged in
+        if (typeof req.session.user === "boolean" && req.session.user )
+        {
+            return response(res, { statusCode: StatusCode.BadRequest, message: "You are already logged in!"})
+        }
   
         if ((typeof body.loginName !== "string") || (typeof body.password !== "string")) 
         {
@@ -103,6 +109,12 @@ export default function Authentication(app: Express, db: Db)
 
                 console.debug(`[Autentication] Success! User: ${user.username} is authenticated!`)
 
+                req.session.user = {
+                    isLoggedIn: true,
+                    userId: user._id.toString()
+                }
+
+                req.session.save()
                 return response(res, {statusCode: StatusCode.Accepted})
             })
         })
