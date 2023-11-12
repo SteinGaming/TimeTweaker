@@ -43,7 +43,7 @@ export default function Authentication(app: Express, db: Db)
         return response
     }
 
-    app.post("/api/authenticate", (req, res) => {
+     app.post("/api/authenticate", async (req, res) => {
 
         function sendInvailidLoginInformation()
         {
@@ -89,7 +89,7 @@ export default function Authentication(app: Express, db: Db)
 
 
 
-            bcrypt.compare(PEPPER + password, user.password, (err, isSame ) => {
+            bcrypt.compare(PEPPER + password, user.password, async (err, isSame ) => {
                 if (err) {
                     console.debug(`[Autentication] Error: Somebody tried to login to the User acc ${user.username} with wrong password!`)
                     return sendInvailidLoginInformation()
@@ -108,13 +108,12 @@ export default function Authentication(app: Express, db: Db)
                 }
 
                 console.debug(`[Autentication] Success! User: ${user.username} is authenticated!`)
-
                 req.session.user = {
                     isLoggedIn: true,
                     userId: user._id.toString()
                 }
 
-                req.session.save()
+                await req.session.save()
                 return response(res, {statusCode: StatusCode.Accepted})
             })
         })

@@ -1,14 +1,18 @@
 import Session from "express-session";
 import { Express } from "express";
+import SessionStore from "../security/SessionStore.js";
+import { getRedis } from "../utils/databases.js";
 
-type User = {
+export type User = {
     isLoggedIn: boolean;
-    userId: string;
+    userId: string | null;
 };
 
 declare module "express-session" {
     interface SessionData {
       user: User
+      lastSeen: Date | null;
+      creationDate: Date;
     }
 }
 
@@ -16,7 +20,8 @@ declare module "express-session" {
 const sessionSettings: Session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "password",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: new SessionStore()
 }
 
 export default function ConfigureSession(app: Express)

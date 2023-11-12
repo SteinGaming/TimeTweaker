@@ -1,3 +1,5 @@
+# School Tool Upgrade your school experience
+
 ## Example ".env" file
 
 ```.env
@@ -5,13 +7,18 @@
 PORT=3000
 
 # Database
-MONGODB_HOST="10.0.1.15:27017"
-MONGODB_USER=""
-MONGODB_PASSWORD=""
+MONGODB_HOST="127.0.0.1:27017"
+#MONGODB_USER=""
+#MONGODB_PASSWORD=""
 MONGODB_DATABASE="timeTweaker"
 
+# Caching Database
+REDIS_HOST=""
+REDIS_USER=""
+REDIS_PASSWORD=""
+
 # User System
-PASSWORD_PEPPER="n8Avq^xt9118KZ6"
+PASSWORD_PEPPER="pleaschangeinproduction"
 
 ```
 

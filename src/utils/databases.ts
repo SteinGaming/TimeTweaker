@@ -26,8 +26,8 @@ export async function getMongoDB() {
         mongoDB = await initMongoDB()
     return mongoDB
 }
-
-let redis: RedisClientType<{  } & RedisModules, RedisFunctions, RedisScripts> = undefined
+export type RedisClient = RedisClientType<{  } & RedisModules, RedisFunctions, RedisScripts>
+let redis: RedisClient = undefined
 async function initRedis() {
     const credentials = process.env.REDIS_USER == undefined ? "" : process.env.REDIS_USER + ":" + process.env.REDIS_PASSWORD + "@"
 
