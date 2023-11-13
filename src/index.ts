@@ -7,6 +7,7 @@ import Authentication from "./routers/authentication.js";
 import ConfigureSession from "./startup/ConfigureSession.js";
 import Logout from "./routers/logout.js";
 import Logger from "./utils/logger.js";
+import RequestLogging from "./middlewares/requestLogging.js";
 
 let log = new Logger("Main")
 dotenv.config()
@@ -25,6 +26,7 @@ ConfigureSession(app)
 async function main()
 {
     const db = await getMongoDB()
+    RequestLogging(app)
     Registration(app, db)
     Authentication(app, db)
     Logout(app)

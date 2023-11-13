@@ -36,6 +36,9 @@ export default class SmartStore extends Store
         if (redisResRaw !== null) 
         {
             logger.debug("Loaded session from redis")
+            
+            redis.expire(REDIS_SESSION_PREFIX + sid, REDIS_EXPIRE_TIME)
+            
             cb(null, JSON.parse(redisResRaw))
             return
         }
@@ -55,7 +58,7 @@ export default class SmartStore extends Store
     }
     async set(sid: string, data: SessionData, cb = noop)
     {
-
+        const redis = await getRedis()
         const dbSessionData: DbSession = {
             ...data,
             sessionId: sid
@@ -65,16 +68,16 @@ export default class SmartStore extends Store
         const sessions = mongodb.collection<DbSession>("sessions")
 
         const res = await sessions.findOneAndReplace( { sessionId: sid}, dbSessionData)
-        if (res !== null)
+        if (res.ok)
         {
+            setSessionDataInRedis(sid, dbSessionData)
             return cb()
         }
         const saveResult = await sessions.insertOne(dbSessionData)
+        
         if (!saveResult.acknowledged)
-        {
-            cb("Failed to save session!")
-            return
-        }
+            return cb("Failed to save session!")
+
         await setSessionDataInRedis(sid, dbSessionData)
         cb()
         
@@ -87,5 +90,6 @@ export default class SmartStore extends Store
         
         await redis.del(REDIS_SESSION_PREFIX + sid)
         await sessions.deleteMany({"sessionId": sid})
+        cb()
     }
 }
