@@ -8,7 +8,7 @@ dotenv.config()
 const mlog = new Logger("MongoDB")
 const rlog = new Logger("Redis")
 
-let mongoDB: Db = undefined;
+let mongoDB: Db | undefined = undefined;
 
 async function initMongoDB() {
     const credentials = process.env.MONGODB_USER == undefined ? "" : process.env.MONGODB_USER + ":" + process.env.MONGODB_PASSWORD + "@"
@@ -30,7 +30,7 @@ export async function getMongoDB() {
     return mongoDB
 }
 export type RedisClient = RedisClientType<{  } & RedisModules, RedisFunctions, RedisScripts>
-let redis: RedisClient = undefined
+let redis: RedisClient | undefined = undefined
 async function initRedis() {
     const credentials = process.env.REDIS_USER == undefined ? "" : process.env.REDIS_USER + ":" + process.env.REDIS_PASSWORD + "@"
 

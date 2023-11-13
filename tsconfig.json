@@ -3,7 +3,8 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "es2020",
-    "sourceMap": true,
-    "outDir": "build"
+    "strict": true,
+    "outDir": "build",
+    "incremental": true
   }
 }

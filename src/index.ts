@@ -24,6 +24,7 @@ app.use(cookieParser())
 ConfigureSession(app)
 async function main()
 {
+    log.debug("Starting!")
     const db = await getMongoDB()
     Registration(app, db)
     Authentication(app, db)
