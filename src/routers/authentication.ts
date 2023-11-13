@@ -74,20 +74,17 @@ export default function Authentication(app: Express, db: Db)
 
         if (!loginNameResult.valid)
         {
-            console.debug("[Autentication] Error: Login Information is not valid!")
+            log.debug("Login Information is not valid!")
             return sendInvalidLoginInformation()
         }
 
         users.findOne(loginNameResult.username ? { username: { $eq: loginName}} : { emailAddress: { $eq: loginName}}).then(user => {
             if (user === null) return sendInvalidLoginInformation()
 
-
-
             bcrypt.compare(PEPPER + password, user.password, async (err, isSame ) => {
                 if (err) {
-                    console.debug(`[Autentication] Error: Somebody tried to login to the User acc ${user.username} with wrong password!`)
+                    log.debug(`Somebody tried to login to the User acc ${user.username} with wrong password!`, err)
                     return sendInvalidLoginInformation()
-                    throw err
                 }
                 if (!isSame) return sendInvalidLoginInformation()
 
@@ -101,13 +98,13 @@ export default function Authentication(app: Express, db: Db)
                     return response(res, {statusCode: StatusCode.Unauthorized, message: "Your Account has not been Verified yet. Please view in your Mailbox to verify your account."})
                 }
 
-                console.debug(`[Autentication] Success! User: ${user.username} is authenticated!`)
+                log.debug(`User: ${user.username} is authenticated!`)
                 req.session.user = {
                     isLoggedIn: true,
                     userId: user._id.toString()
                 }
 
-                await req.session.save()
+                req.session.save()
                 return response(res, {statusCode: StatusCode.Accepted})
             })
         })

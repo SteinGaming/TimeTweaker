@@ -1,5 +1,5 @@
 import {Express, Request, Response} from "express";
-export default async function Logout(app: Express) // , db: Db
+export default function Logout(app: Express) // , db: Db
 {
     app.get("/api/logout", (req, res) => {
         if (req.session.user?.isLoggedIn)
