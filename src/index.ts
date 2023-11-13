@@ -5,13 +5,12 @@ import Registration from "./routers/registration.js";
 import { getMongoDB } from "./utils/databases.js";
 import Authentication from "./routers/authentication.js";
 import ConfigureSession from "./startup/ConfigureSession.js";
+import Logger from "./utils/logger.js";
 
-
+let log = new Logger("Main")
 dotenv.config()
 
 const PORT = process.env.PORT || 80
-
-
 
 const app = express()
 
@@ -28,7 +27,7 @@ async function main()
     Registration(app, db)
     Authentication(app, db)
     app.listen(PORT, () => {
-        console.log(`TimeTweaker-Backend started on port: ${PORT} (http://127.0.0.1:${PORT}).`)
+        log.debug(`TimeTweaker-Backend started on port: ${PORT} (http://127.0.0.1:${PORT}).`)
     })
 }
 

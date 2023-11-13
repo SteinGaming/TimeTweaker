@@ -25,54 +25,26 @@ export default function Registration(app: Express, db: Db) // , db: Db
         
 
         // Check if varables are defined
-        if (typeof body.username !== "string")
-        {
-            return response(res, {statusCode: StatusCode.BadRequest})
-
-        }
-        if (typeof body.fullname !== "string")
-        {
-            return response(res, {statusCode: StatusCode.BadRequest})
-
-        }
-        if (typeof body.emailAddress !== "string")
-        {
-            return response(res, {statusCode: StatusCode.BadRequest})
-
-        }        
-        if (typeof body.password !== "string")
-        {
-            return response(res, {statusCode: StatusCode.BadRequest})
+        const fields = [
+            "username", "fullname", "emailAddress", "password"
+        ]
+        for (const field of fields) {
+            if (typeof body[field] === 'string') continue
+            return response(res, {statusCode: StatusCode.BadRequest, message: `Missing Field: ${field}`})
         }
 
         // Check if variables are valid
-        const emailRes = isEmailAddress(body.emailAddress)
-        if (emailRes !== "")
-        {
-            return response(res, {statusCode: StatusCode.BadRequest, message: emailRes})
-        }
+        const list = [
+            isEmailAddress(body.emailAddress), isUsername(body.username), isPassword(body.password), isFullname(body.fullname)
+        ]
 
-        const usernameRes = isUsername(body.username)
-        if (usernameRes !== "")
-        {
-            return response(res, {statusCode: StatusCode.BadRequest, message: usernameRes})
+        for (const el of list) {
+            if (el !== undefined)
+                return response(res, {statusCode: StatusCode.BadRequest, message: el})
         }
-
-        const passwordRes = isPassword(body.password)
-        if (usernameRes !== "")
-        {
-            return response(res, {statusCode: StatusCode.BadRequest, message: passwordRes})
-        }
-
-        const fullnameRes = isFullname(body.fullname)
-        if (fullnameRes !== "")
-        {
-            return response(res, {statusCode: StatusCode.BadRequest, message: fullnameRes})
-        }
-
         // WIP: check whitch is the same username or emailAddress etc.
 
-        users.findOne({username: body.username, emailAddress: body.emailAddress, password: body.password}).then(result => {
+        users.findOne({ $or: [{username: body.username}, {emailAddress: body.emailAddress}]}).then(result => {
             if (result !== null)
             {
                 return response(res, {statusCode: StatusCode.BadRequest, message: "User already exists!"})

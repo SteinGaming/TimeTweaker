@@ -1,9 +1,12 @@
 import dotenv from "dotenv"
 import {Db, MongoClient} from "mongodb";
 import {createClient, RedisClientType, RedisFunctions, RedisModules, RedisScripts} from "redis";
+import Logger from "./logger.js";
 
 dotenv.config()
 
+const mlog = new Logger("MongoDB")
+const rlog = new Logger("Redis")
 
 let mongoDB: Db = undefined;
 
@@ -16,7 +19,7 @@ async function initMongoDB() {
     const client = new MongoClient(url);
     await client.connect();
 
-    console.log('Connected successfully to MongoDb server!');
+    mlog.debug('Connected successfully to MongoDb server!');
 
     return client.db(dbName);
 }
@@ -40,6 +43,8 @@ async function initRedis() {
         console.error("Encountered error on redis init", err)
     })
     await client.connect()
+    rlog.debug('Connected successfully to Redis server!');
+
 
     return client
 }

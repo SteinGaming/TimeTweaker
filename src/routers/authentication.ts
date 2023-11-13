@@ -5,6 +5,7 @@ import {Express, Request, Response} from "express";
 import response, { StatusCode } from "../utils/response.js";
 import { isEmailAddress, isUsername } from "../security/CheckUserInput.js";
 import { DbUser } from "../utils/types/DbUser.js";
+import Logger from "../utils/logger.js";
 
 const INVALID_LOGIN_INFORMATION_MESSAGE = "Invalid username/E-Mail-Address or password"
 
@@ -19,6 +20,8 @@ const PEPPER = process.env.PASSWORD_PEPPER
         "password": "password"
     }
 */
+
+let log = new Logger("Auth")
 export default function Authentication(app: Express, db: Db)
 {
     const users = db.collection<DbUser>("users")
@@ -31,9 +34,9 @@ export default function Authentication(app: Express, db: Db)
             username: false
         }
 
-        if ( isEmailAddress(usernameOrMailAddress) === "") return response
+        if ( isEmailAddress(usernameOrMailAddress) === undefined) return response
 
-        if ( isUsername(usernameOrMailAddress) === "")
+        if ( isUsername(usernameOrMailAddress) === undefined)
         {
             response.username = true
             return response
@@ -45,7 +48,7 @@ export default function Authentication(app: Express, db: Db)
 
      app.post("/api/authenticate", async (req, res) => {
 
-        function sendInvailidLoginInformation()
+        function sendInvalidLoginInformation()
         {
             return response(res, { statusCode: StatusCode.BadRequest, message: INVALID_LOGIN_INFORMATION_MESSAGE})
         }
@@ -58,10 +61,10 @@ export default function Authentication(app: Express, db: Db)
             return response(res, { statusCode: StatusCode.BadRequest, message: "You are already logged in!"})
         }
   
-        if ((typeof body.loginName !== "string") || (typeof body.password !== "string")) 
+        if ((typeof body.loginName !== "string") || (typeof body.password !== "string"))
         {
-            console.debug("[Autentication] Error: loginName or Password must be a string")
-            return sendInvailidLoginInformation()
+            log.error("loginName or Password must be a string")
+            return sendInvalidLoginInformation()
         }
 
         const loginName = body.loginName
@@ -72,30 +75,21 @@ export default function Authentication(app: Express, db: Db)
         if (!loginNameResult.valid)
         {
             console.debug("[Autentication] Error: Login Information is not valid!")
-            return sendInvailidLoginInformation()
+            return sendInvalidLoginInformation()
         }
 
-        let dbQuery = {}
-
-        if (loginNameResult.username)
-        {
-            dbQuery = { username: { $eq: loginName}}
-        } else {
-            dbQuery = { emailAddress: { $eq: loginName}}
-        }
-
-        users.findOne(dbQuery).then(user => {
-            if (user === null) return sendInvailidLoginInformation()
+        users.findOne(loginNameResult.username ? { username: { $eq: loginName}} : { emailAddress: { $eq: loginName}}).then(user => {
+            if (user === null) return sendInvalidLoginInformation()
 
 
 
             bcrypt.compare(PEPPER + password, user.password, async (err, isSame ) => {
                 if (err) {
                     console.debug(`[Autentication] Error: Somebody tried to login to the User acc ${user.username} with wrong password!`)
-                    return sendInvailidLoginInformation()
+                    return sendInvalidLoginInformation()
                     throw err
                 }
-                if (!isSame) return sendInvailidLoginInformation()
+                if (!isSame) return sendInvalidLoginInformation()
 
                 if ( !user.isActive )
                 {
