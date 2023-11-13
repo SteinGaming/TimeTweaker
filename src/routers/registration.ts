@@ -22,26 +22,27 @@ export default function Registration(app: Express, db: Db) // , db: Db
     */
     app.post("/api/register", (req, res) => {
         const body = req.body
-        
 
         // Check if varables are defined
         if (typeof body.username !== "string")
         {
+            logger.debug("username address is undefined")
             return response(res, {statusCode: StatusCode.BadRequest})
-
         }
         if (typeof body.fullname !== "string")
         {
+            logger.debug("fullname is undefined")
             return response(res, {statusCode: StatusCode.BadRequest})
-
         }
         if (typeof body.emailAddress !== "string")
         {
+            logger.debug("Email-Address is undefined")
             return response(res, {statusCode: StatusCode.BadRequest})
 
         }        
         if (typeof body.password !== "string")
         {
+            logger.debug("Password is undefined")
             return response(res, {statusCode: StatusCode.BadRequest})
         }
 
@@ -72,7 +73,7 @@ export default function Registration(app: Express, db: Db) // , db: Db
 
         // WIP: check whitch is the same username or emailAddress etc.
 
-        users.findOne({username: body.username, emailAddress: body.emailAddress, password: body.password}).then(result => {
+        users.findOne({username: body.username, emailAddress: body.emailAddress}).then(result => {
             if (result !== null)
             {
                 return response(res, {statusCode: StatusCode.BadRequest, message: "User already exists!"})
@@ -100,11 +101,5 @@ export default function Registration(app: Express, db: Db) // , db: Db
     
             })
         })
-
-
-
-
-        
     })
 }
-

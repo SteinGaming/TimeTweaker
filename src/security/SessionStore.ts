@@ -37,16 +37,17 @@ export default class SmartStore extends Store
         {
             logger.debug("Loaded session from redis")
             cb(null, JSON.parse(redisResRaw))
+            return
         }
 
         const mongodb = await getMongoDB()
         const sessions = mongodb.collection<DbSession>("sessions")
-        const session = await sessions.findOne({"sessionId": sid})
+        const session = await sessions.findOne({"sessionId": sid}, {projection:{_id:0}})
 
         if (session !== null)
         {
             await setSessionDataInRedis(sid, session)
-            logger.debug("Loaded session from db", session)
+            logger.debug("Loaded session from db")
             cb(null, session)
             return
         }
@@ -54,6 +55,7 @@ export default class SmartStore extends Store
     }
     async set(sid: string, data: SessionData, cb = noop)
     {
+
         const dbSessionData: DbSession = {
             ...data,
             sessionId: sid
@@ -62,10 +64,14 @@ export default class SmartStore extends Store
         const mongodb = await getMongoDB()
         const sessions = mongodb.collection<DbSession>("sessions")
 
+        const res = await sessions.findOneAndReplace( { sessionId: sid}, dbSessionData)
+        if (res !== null)
+        {
+            return cb()
+        }
         const saveResult = await sessions.insertOne(dbSessionData)
         if (!saveResult.acknowledged)
         {
-            logger.debug("Failed to save session!")
             cb("Failed to save session!")
             return
         }
@@ -73,8 +79,13 @@ export default class SmartStore extends Store
         cb()
         
     }
-    destroy(sid: string)
+    async destroy(sid: string, cb = noop)
     {
-        logger.info("destr", sid);
+        logger.debug("Delete session:", sid)
+        const redis = await getRedis();
+        const sessions = (await getMongoDB()).collection<DbSession>("sessions")
+        
+        await redis.del(REDIS_SESSION_PREFIX + sid)
+        await sessions.deleteMany({"sessionId": sid})
     }
 }
