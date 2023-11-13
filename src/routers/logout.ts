@@ -7,6 +7,6 @@ export default function Logout(app: Express) // , db: Db
             req.session.user.isLoggedIn = false
             req.session.save()
         }
-        res.send(200)
+        res.sendStatus(200)
     })
 }

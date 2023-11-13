@@ -13,7 +13,7 @@ export interface DbSession extends SessionData
 }
 
 const noop = (_err?: unknown, _data?: any) => {}
-async function setSessionDataInRedis(sid, data: DbSession)
+async function setSessionDataInRedis(sid: string, data: DbSession)
 {
     const redis = await getRedis();
     redis.setEx(REDIS_SESSION_PREFIX + sid, REDIS_EXPIRE_TIME, JSON.stringify(data));
@@ -70,7 +70,7 @@ export default class SmartStore extends Store
         const res = await sessions.findOneAndReplace( { sessionId: sid}, dbSessionData)
         if (res.ok)
         {
-            setSessionDataInRedis(sid, dbSessionData)
+            await setSessionDataInRedis(sid, dbSessionData)
             return cb()
         }
         const saveResult = await sessions.insertOne(dbSessionData)
